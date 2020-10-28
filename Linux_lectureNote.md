@@ -1,9 +1,9 @@
 #  #
-##Module 1. Linux 介紹
+## Module 1. Linux 介紹
 
 - 1977 BSD
 
-##Module 2. 發行版本
+## Module 2. 發行版本
 
 - **RedHat/CentOS**		<br>
 佔有率50%, 防火系統好, 企業/公有雲用
@@ -13,17 +13,17 @@
 最早發表, 學術網路用
 
 
-##Module 3. 安裝規劃
+## Module 3. 安裝規劃
 
 - VMware (enterprise standard)
 - VM player (free)
 - VirtulBox (Sun developed)
 - Hyper-V (Microsoft)
 
-##Module 4. 安裝系統
-##Module 5. Post Installation 安裝後續
+## Module 4. 安裝系統
+## Module 5. Post Installation 安裝後續
 
-##Module 6. 初次使用系統
+## Module 6. 初次使用系統
 
 - ubuntu server: 遠端文字模式登入
 - 確定系統ssh server有啟動:	<br>
@@ -35,7 +35,7 @@
 - poweroff 是個有特別開放給"非"root的指令，所以主機通常會放在有門禁的機房
 - `alias list=ls` 用list替代ls
 
-##Module 7. 查指令說明
+## Module 7. 查指令說明
 
 ls/cp/cat/rm
 
@@ -53,7 +53,7 @@ ls/cp/cat/rm
 
 
 
-##Module 8. 檔案系統
+## Module 8. 檔案系統
 
 FHS: Filesystem Hierarchy Standard
 
@@ -68,16 +68,16 @@ FHS: Filesystem Hierarchy Standard
 `ls -h` :human readable
 
 
-##Module 9. 基本檔案管理
+## Module 9. 基本檔案管理
 
 `mkdir rmdir cp mv rm`	<br>
 `mv 123.txt 123.txt` : redhat會問Y or N 要不要覆蓋，debian不會問 
 
-##Module 10. 處理文字檔內容
+## Module 10. 處理文字檔內容
 
 `wc cat head tail less`
 
-##Module 11. I/O重導與管線
+## Module 11. I/O重導與管線
 ### > >> 
 輸出導向, `>`create new file ,`>>` append to exist file<br>
 
@@ -108,7 +108,7 @@ cat<<end, 遇到結束字元"end"cat停止
 管線
 
 
-##Module 12. 資料串流指令
+## Module 12. 資料串流指令
 tr, cut, sort/uniq (少用到)
 
 ## Module 13. 檔案搜尋
@@ -233,26 +233,26 @@ For Linux environment, ' ' 讓shell不去解釋任何特殊符號的意義 <br>
 - .tar.bz2 == .tbz (tar+bz2)	**trend to phase out, after 2013, Linux kernel 官網不再提供bz2的壓縮檔 
 - .tar.xz == .txz (tar+xz)		**技術新,壓縮比高, 7-zip usable
 
-##Module 21. 文書處理器vi/vim
-##Module 22. 文書處理器nano
-##Module 23. 帳號管理
-##Module 24. 群組管理
-##Module 25. 軟體管理YUM
-##Module 26. 軟體管理APT
-##Module 27. 行程管理
-##Module 28. 背景程式
-##Module 29. 系統日誌檢視
-##Module 30. 系統開機
-##Module 31. 系統服務
-##Module 32. 網路設定
-##Module 33. bash 變數
-##Module 34. bash shell 指令
-##Module 35. bash 環境設定檔
-##Module 36. 簡單 shell script
+## Module 21. 文書處理器vi/vim
+## Module 22. 文書處理器nano
+## Module 23. 帳號管理
+## Module 24. 群組管理
+## Module 25. 軟體管理YUM
+## Module 26. 軟體管理APT
+## Module 27. 行程管理
+## Module 28. 背景程式
+## Module 29. 系統日誌檢視
+## Module 30. 系統開機
+## Module 31. 系統服務
+## Module 32. 網路設定
+## Module 33. bash 變數
+## Module 34. bash shell 指令
+## Module 35. bash 環境設定檔
+## Module 36. 簡單 shell script
 
 
 ==============================================================
-##Module a. Linux basic concepts
+## Module a. Linux basic concepts
 
 - DNS:名稱解析中心
 - gateway: 預設閘道
@@ -293,7 +293,7 @@ UID<1000: system user <br>
 
 
 ==============================================================
-##Module b. Linux cheat sheet
+## Module b. Linux cheat sheet
 	uname -r 			# show linux kernal version
 
 	file [fileName] 	# show file type
