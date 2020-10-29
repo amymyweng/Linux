@@ -171,6 +171,8 @@ which後面接完整檔名，不可使用萬用字元<br>
 
 	find foldername/. -name fileNmae -size fileSize - type f(file)/d(dir) -atime -7(past 7 days)
 
+	
+
 
 
 ## Module 14. Regular Expression (RE)
@@ -210,13 +212,105 @@ For Linux environment, ' ' 讓shell不去解釋任何特殊符號的意義 <br>
 	```
 
 ## Module 16. LVM系統
+
+ 可online extend檔案系統，先格式化兩顆硬碟，加入同一VG，from UNIX		<br>
+
+- VG: Volume Group
+- LV: Logical Volume
+- PV: Physical Volume
+- PE: Physical Extent
+- LE: Logical Extend
+
+- /dev/sda5: 從SATA切出第一顆硬碟當PE
+	1. /dev 存放device file的目錄，每一個device file對應到某個硬碟
+	2. s: SCI or SATA
+	3. d: disk
+	4. a: first disk
+	5. logical partition	
+
+### pvs/ vgs/ lvs
+
+	root@ubuntu99:~# pvs
+	  PV         VG       Fmt  Attr PSize    PFree 
+	  /dev/sda5  vgubuntu lvm2 a--  <499.50g 32.00m
+
+	root@ubuntu99:~# vgs
+	  VG       #PV #LV #SN Attr   VSize    VFree 
+	  vgubuntu   1   2   0 wz--n- <499.50g 32.00m		#500G幾乎切光
+		
+安裝時有選用LVM此指令lvs才有info			<br>
+若沒有用LMS，硬碟爆掉就無法擴充(need enter console to solve)		<br>
+		
+	root@ubuntu99:~# lvs	
+	  LV     VG       Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+	  root   vgubuntu -wi-ao---- 498.51g                                                    
+	  swap_1 vgubuntu -wi-ao---- 976.00m
+    
+
+
 ## Module 17. 檔案與目錄權限
+
+`umask` Display or set file mode mask.		<br>
+
+- `r` Read: file(car,less,head,vi,nano....), dir(ls,find)
+- `w` Write: file(vi,vi,nano,>,>>...), dir(cp,rm,mv,>,>>,...)
+- `x` Execute: file, dir(cd)
+
+`ls -l`: show permission info
+
+#### -/d/l rwx rwx rwx
+
+- fileType: -(一般檔案) d(目錄) l(soft link)
+- Owner permission: 檔案擁有者(owner)的權限
+- Group permission: 檔案所屬群組(group)的權限
+- Other permission: 其他人(other)的權限
+
+`$` :一般user		<br>
+`~`: home directory			<br>
+
+`chmod` : change mod		<br>
+組合7, 6 , 5, 4 :正常權限, 3,2,1 for management	<br>
+`777` :權限全開
+
+#### Modern Style
+
+- Permission: e, w, x, a(all)
+- action: +(授權), -(移除), =(置換)
+- 對象: u(owner), g(group), o(other)
+
+- `chmod 777` == `chmod a=rwx`
+- `chmod 644` == `chmod u=rw,go=r`
+- `chmod 600` == `chmod u=rw,go=`
+
+#### RedHat and Unutu having big difference
+
+Redhadt: default /home/user permission `drwx------` <-- this why Redhat with higer security	<br>
+Ubuntu: default /home/user permission `drwxr-xr-x`			<br>    
+
+Ubuntu /root  drwx------	<br>
+
+
+
+
+
+
+
+
+
+
 ## Module 18. 檔案與目錄授權
+
+`chown`		<br> 
+user: 同時修改user/group (此group同user login group);使用id查login group		<br>
+只有root可執行chown
+
+
 ## Module 19. 檔案打包壓縮
 ## Module 20. 檔案解壓縮
 
-	tar -xvf
-	tar -cvf
+	tar -tvf		#check tar content 
+	tar -xvf		#extract
+	tar -cvf		#creat
 
 - `tar` 打包
 - c,t,x (same type, can be choosed 1 type only)
@@ -228,17 +322,94 @@ For Linux environment, ' ' 讓shell不去解釋任何特殊符號的意義 <br>
 		-f	#打包解壓縮的file name                                
 		-C	#配合-x, 指定解開的路徑, 安裝hadoop時會用到            
 
-- 壓縮
+#### 壓縮
+
 - .tar.gz == .tgz (tar+gzip) 	**general, Linux/Windows/Mac OK
 - .tar.bz2 == .tbz (tar+bz2)	**trend to phase out, after 2013, Linux kernel 官網不再提供bz2的壓縮檔 
 - .tar.xz == .txz (tar+xz)		**技術新,壓縮比高, 7-zip usable
 
+#### application path
+
+- tar -xvf XXX.tar -C /usr/local	#第三方已編譯完成的應用程式 (open source)
+- tar -xvf XXX.tar -C /opt			#廠商的應用程式 (vendor)
+
+
+
 ## Module 21. 文書處理器vi/vim
+
+- vim: RedHat distribution (CentOS, RHEL, SuSE, Fedora...)  <br>
+- nano: Debian distributions (Ubuntu...)
+- vi: Optional (RedHat/Debian 都有提供)
+
+	root@ubuntu99:~# apt show vim 
+	Package: vim
+	Version: 2:8.1.2269-1ubuntu5
+	Priority: optional
+	Section: editors
+	Origin: Ubuntu
+
+
+
 ## Module 22. 文書處理器nano
+
+- [Alt]+[N]: show line number
+- Ctrl + K : cut line
+- Alt + U: paste line
+
 ## Module 23. 帳號管理
 ## Module 24. 群組管理
-## Module 25. 軟體管理YUM
-## Module 26. 軟體管理APT
+## Module 25. 軟體管理YUM (CentOS)
+
+- rpm: 單一套件安裝 (`rpm -qa`: show所有已安裝套件)
+- yum : 倉庫式的套件安裝，會自動處理套件相依性的問題 
+
+yum安裝容易,rpm成查詢用途  <br>
+
+yum.conf; *.repo        <br>
+
+- yum update:升級所有套件(Be careful!!)
+
+## Module 26. 軟體管理APT (Debian)
+
+- `/etc/apt/sources.list` : 更新repository 倉庫 (主設定檔)
+- dpkg : 單一套件安裝 (已經不用來安裝及移除, replaced by apt)
+
+		dpkg -l 			#show 已安裝套件
+		dpkg -S keyword 	#反查
+
+- **apt : 倉庫式的套件安裝，會自動處理套件相依性的問題**
+- `/etc/apt/sources.list.d` :  (目錄，內含其他的子設定檔) (ex.mariaDB)
+
+- apt -get update: 要自行更新，更新倉庫清單
+- apt 是 apt-get 的簡單版
+
+- apt-get upgrade : 更新系統升級 (be careful!!) (ex. OpenCV要確認升級後可否用)
+
+- apt show package-name : 查詢
+- apt install package-name : 安裝
+
+- apt remove package : 移除套件(會保留設定檔)
+- apt-get purge package : 移除套件(同時移除設定檔)
+- apt autoremove : 移除不用的套件
+- apt clean : 清除之前下載的安裝檔 (*.deb)
+
+		apt show openjdk-11-jdk   
+		...
+		Depends: openjdk-11-jre (= 11.0.9+11-0ubuntu1~20.04), openjdk-11-jdk-headless (= 11.0.9+11-0ubuntu1~20.04), libc6 (>= 2.2.5)
+
+		apt install openjdk-11-jdk		#start installing 
+	
+		root@bdse8:~# javac -version
+		javac 11.0.9
+
+		root@bdse8:~# java -version
+		openjdk version "11.0.9" 2020-10-20
+		OpenJDK Runtime Environment (build 11.0.9+11-Ubuntu-0ubuntu1.20.04)
+		OpenJDK 64-Bit Server VM (build 11.0.9+11-Ubuntu-0ubuntu1.20.04, mixed mode, sharing)
+	
+ps. headless: without GUI
+
+
 ## Module 27. 行程管理
 ## Module 28. 背景程式
 ## Module 29. 系統日誌檢視
@@ -289,7 +460,9 @@ UID<1000: system user <br>
 - Linux: `\n`
 - Max: `\r`
 
+### 127.0.0.1 
 
+稱為loopback, 本機localhost			<br>
 
 
 ==============================================================
@@ -297,5 +470,31 @@ UID<1000: system user <br>
 	uname -r 			# show linux kernal version
 
 	file [fileName] 	# show file type
-		ubuntu@ubuntu99:~$ file performance_small.txt 
-		performance_small.txt: ASCII text, with very long lines, with CRLF line terminators
+
+	ubuntu@ubuntu99:~$ file performance_small.txt 
+	performance_small.txt: ASCII text, with very long lines, with CRLF line terminators
+
+	df -h				# check file system size
+	du -h				# Summarize disk usage
+
+	root@ubuntu99:~# df -h
+	檔案系統                   容量  已用  可用 已用% 掛載點
+	udev                       7.8G     0  7.8G    0% /dev
+	tmpfs                      1.6G  1.9M  1.6G    1% /run
+	/dev/mapper/vgubuntu-root  490G   24G  442G    5% /								#主要check root是否爆掉
+	tmpfs                      7.9G     0  7.9G    0% /dev/shm
+	tmpfs                      5.0M  4.0K  5.0M    1% /run/lock
+	tmpfs                      7.9G     0  7.9G    0% /sys/fs/cgroup
+	/dev/loop5                  50M   50M     0  100% /snap/snap-store/467
+	/dev/loop2                 256M  256M     0  100% /snap/gnome-3-34-1804/36
+	/dev/loop3                  63M   63M     0  100% /snap/gtk-common-themes/1506
+	/dev/loop7                  31M   31M     0  100% /snap/snapd/9721
+	/dev/loop1                  56M   56M     0  100% /snap/core18/1932
+	/dev/loop4                 218M  218M     0  100% /snap/gnome-3-34-1804/60
+	/dev/loop8                  51M   51M     0  100% /snap/snap-store/481
+	/dev/loop6                  31M   31M     0  100% /snap/snapd/9279
+	/dev/loop0                  56M   56M     0  100% /snap/core18/1885
+	/dev/sda1                  511M  4.0K  511M    1% /boot/efi						# Linux kernal
+	tmpfs                      1.6G   24K  1.6G    1% /run/user/1000
+
+
