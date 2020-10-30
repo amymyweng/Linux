@@ -99,10 +99,36 @@ cat<<end, 遇到結束字元"end"cat停止
 	123
 	234
 
-- Python 第一提示字元`>>>`
-- PYthon 第二提示字元`...`
-- Linux 第一提示字元`$`
-- Linux 第二提示字元`>`
+
+- Linux bash shell 第一提示字元(first prompt): `$` (一般使用者) or `#` (系統管理員)
+- Linux bash shell 第二提示字元(second prompt): `>`
+
+
+- second prompt 表指令不完整 
+- ctrl + C : 放棄錯誤(KeyboradInterrupt in Python3) 
+
+		hadoop@ubuntu99:~$ eixt'
+		> 12
+		> '
+		eixt
+		12
+		: command not found
+
+- Python shell 第一提示字元 `>>>`
+- PYthon shell 第二提示字元 `...`
+
+		hadoop@ubuntu99:~$ python3
+		Python 3.8.5 (default, Jul 28 2020, 12:59:40) 
+		[GCC 9.3.0] on linux
+		Type "help", "copyright", "credits" or "license" for more information.
+		>>> ( 2+
+		... 
+		... 1
+		... 
+		... )
+		3
+
+
 
 ### |
 管線
@@ -357,7 +383,113 @@ user: 同時修改user/group (此group同user login group);使用id查login grou
 - Alt + U: paste line
 
 ## Module 23. 帳號管理
+
+UID: User ID		<br>
+GIP: Group ID		<br>
+
+- Root account: UID=0
+- System account: UID <1000
+- User account: UID>=1000
+
+- Application account (for certain application managment) (don't use the account to login)
+
+- `$6$`: SHA-512 加密方式, 不可逆
+- `$6$............$` : SALT
+
+		root@ubuntu99:/etc# tail -5  /etc/shadow 
+		pulse:*:18474:0:99999:7:::
+		gnome-initial-setup:*:18474:0:99999:7:::
+		gdm:*:18474:0:99999:7:::
+		ubuntu:$6$1Wee872Jp6MfrkuC$OaSeRaUf/PmM84Ol2EPtdCwf7Qy/8sfZy5gvjpED4wAVV1QX9gB22ruBY20EBhgqPBYWd6pMmTN.56jUgvIck0:18520:0:99999:7:::
+		systemd-coredump:!!:18520::::::
+
+- Debian distribution: root is disable.
+
+- sudo -i
+- grep '^root' /etc/shaodw'
+- server Ubuntu: * 表停用
+- Desktop Ubuntu: ! 表停用
+
+		root@bdse8:~# grep '^root' /etc/shadow
+		root:*:18474:0:99999:7:::
+
+		root@ubuntu99:/etc# grep '^root' /etc/shadow
+		root:!:18520:0:99999:7:::
+
+#### 建置帳號
+
+- `adduser hadoop`
+ 
+		root@ubuntu99:~# adduser hadoop
+		Adding user `hadoop' ...
+		Adding new group `hadoop' (1001) ...
+		Adding new user `hadoop' (1001) with group `hadoop' ...
+		Creating home directory `/home/hadoop' ...
+		Copying files from `/etc/skel' ...
+		新 密碼： 
+		再次輸入新的 密碼： 
+		passwd: password updated successfully
+		Changing the user information for hadoop
+		Enter the new value, or press ENTER for the default
+			Full Name []: 
+			Room Number []: 
+			Work Phone []: 
+			Home Phone []: 
+			Other []: 
+		Is the information correct? [Y/n] 
+
+- check new account:
+- 3 files be upddated: group, passwd, shadow
+
+		root@ubuntu99:/etc# ls -ltr | tail -10
+		-rw-r--r--  1 root root      12 Oct 30 09:53 timezone
+		lrwxrwxrwx  1 root root      31 Oct 30 09:53 localtime -> /usr/share/zoneinfo/Asia/Taipei
+		drwxr-xr-x  5 root lp      4096 Oct 30 09:58 cups
+		-rw-r--r--  1 root root    2784 Oct 30 10:00 passwd-
+		-rw-r--r--  1 root root    1066 Oct 30 10:00 group
+		-rw-r-----  1 root shadow   888 Oct 30 10:00 gshadow
+		-rw-r--r--  1 root root      40 Oct 30 10:00 subuid
+		-rw-r--r--  1 root root      40 Oct 30 10:00 subgid
+		-rw-r-----  1 root shadow  1569 Oct 30 10:00 shadow
+		-rw-r--r--  1 root root    2787 Oct 30 10:01 passwd
+
+		root@ubuntu99:/etc# tail -3 passwd
+		ubuntu:x:1000:1000:ubuntu,,,:/home/ubuntu:/bin/bash
+		systemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin
+		hadoop:x:1001:1001:,,,:/home/hadoop:/bin/bash
+
+		root@ubuntu99:/etc# tail -3 shadow
+		ubuntu:$6$1Wee872Jp6MfrkuC$OaSeRaUf/PmM84Ol2EPtdCwf7Qy/8sfZy5gvjpED4wAVV1QX9gB22ruBY20EBhgqPBYWd6pMmTN.56jUgvIck0:18520:0:99999:7:::
+		systemd-coredump:!!:18520::::::
+		hadoop:$6$YXP/FKV/UCzK.SGS$SE/f/Oxg5GM/VWq/Xown4HKncieywZ5DuCSXV8oztJ8M6JUSjbvmSRl8IA9ulXBldOcQdL5geGt/jnIHjKRhF1:18565:0:99999:7:::
+
+#### Using new user "hadoop" to install hadoop
+
+1. Using login account to login system
+2. Using `sudo -i` to root, 安裝軟體<包含系統軟體(apt)and Python套件(pip3)>, exit to login account
+3. Using `sudo - hadoop` switch to Hadoop ecosystem 管理員, then 架設/管理/使用 Hadoop ecosystem 應用程式, exit to login account
+
+##### !!!!!注意!!!!! su 沒下 `-` 會帶不到hadoop的環境設定 (雖然身分有切換):
+
+		ubuntu@ubuntu99:~$ su hadoop
+		密碼： 
+		hadoop@ubuntu99:/home/ubuntu$ id
+		uid=1001(hadoop) gid=1001(hadoop) groups=1001(hadoop)
+
+#### 刪除使用者
+
+- Ubuntu: deluser --remove-home hadoop 
+
 ## Module 24. 群組管理
+
+- 現代的Linux，採用 Private Group Scheme (PGS)的風格
+- 每一個帳號都有一個專屬群組
+
+		root@ubuntu99:~# grep '^hadoop' /etc/passwd /etc/group /etc/shadow
+		/etc/passwd:hadoop:x:1001:1001:,,,:/home/hadoop:/bin/bash
+		/etc/group:hadoop:x:1001:
+		/etc/shadow:hadoop:$6$YXP/FKV/UCzK.SGS$SE/f/Oxg5GM/VWq/Xown4HKncieywZ5DuCSXV8oztJ8M6JUSjbvmSRl8IA9ulXBldOcQdL5geGt/jnIHjKRhF1:18565:0:99999:7:::
+
 ## Module 25. 軟體管理YUM (CentOS)
 
 - rpm: 單一套件安裝 (`rpm -qa`: show所有已安裝套件)
@@ -371,7 +503,7 @@ yum.conf; *.repo        <br>
 
 ## Module 26. 軟體管理APT (Debian)
 
-- `/etc/apt/sources.list` : 更新repository 倉庫 (主設定檔)
+- `/etc/sources.list` : 更新repository 倉庫 (主設定檔)
 - dpkg : 單一套件安裝 (已經不用來安裝及移除, replaced by apt)
 
 		dpkg -l 			#show 已安裝套件
@@ -413,12 +545,187 @@ ps. headless: without GUI
 ## Module 27. 行程管理
 ## Module 28. 背景程式
 ## Module 29. 系統日誌檢視
+
 ## Module 30. 系統開機
+
+- GRUB: GRand Unified Bootloader
+
+- GRUB Lagacy
+- GRUB2 (after Ubuntu 12.04)
+
+		ubuntu@ubuntu99:~$ dpkg -l | grep -i 'grub'
+		ii  grub-common                                2.04-1ubuntu26.3                    amd64        GRand Unified Bootloader (common files)
+		ii  grub-gfxpayload-lists                      0.7                                 amd64        GRUB gfxpayload blacklist
+		ii  grub-pc                                    2.04-1ubuntu26.3                    amd64        GRand Unified Bootloader, version 2 (PC/BIOS version)
+		ii  grub-pc-bin                                2.04-1ubuntu26.3                    amd64        GRand Unified Bootloader, version 2 (PC/BIOS modules)
+		ii  grub2-common                               2.04-1ubuntu26.3                    amd64        GRand Unified Bootloader (common files for version 2)
+
+
 ## Module 31. 系統服務
+
+- systemd系統，第一支啟動的程式稱為"systemd"
+
+		ubuntu@ubuntu99:~$ pstree -hp 
+		systemd(1)─┬─ModemManager(893)─┬─{ModemManager}(919)
+		           │                   └─{ModemManager}(922)
+		           ├─NetworkManager(787)─┬─{NetworkManager}(903)
+		           │                     └─{NetworkManager}(904)
+		           ├─VGAuthService(761)
+		           ├─accounts-daemon(779)─┬─{accounts-daemon}(813)
+		           │                      └─{accounts-daemon}(876)
+
+		ubuntu@ubuntu99:~$ ls -l /usr/sbin/init 
+		lrwxrwxrwx 1 root root 20 Sep 15 11:58 /usr/sbin/init -> /lib/systemd/systemd
+
+- systemctl 常見指令
+
+		list-unit-files
+		status
+		restart
+
 ## Module 32. 網路設定
+
+#### Ubuntu(20.04):
+
+- Server: 使用netplan管網路設定
+- Server: 更改網路設定 /etc/netplan/00-installer-config.yaml
+
+		root@bdse8:~# dpkg -l | grep -i 'netplan'
+		ii  libnetplan0:amd64                    0.100-0ubuntu4~20.04.2            amd64        YAML network configuration abstraction runtime library
+		ii  netplan.io                           0.100-0ubuntu4~20.04.2            amd64        YAML network configuration abstraction for various backends
+
+- Desktop: 使用NetworkManager
+- desktop 更改網路設定 `root@ubuntu99:~# nmtui`
+
+		root@ubuntu99:~# dpkg -l | grep 'network-mana' -i
+		ii  network-manager                            1.22.10-1ubuntu2.1                  amd64        network management framework (daemon and userspace tools)
+		...
+
+
+
+
 ## Module 33. bash 變數
+
+### 環境變數
+
+- 又稱全域變數
+- /home/user/.bash_profile
+- 如果需永久儲存環境變數，可設定在shell的環境設定檔 (shell startup script)
+- `set` : 檢視區域+環境
+- `env` : 檢視區域
+
+- PATH變數 屬於env
+
+		ubuntu@ubuntu99:~$ env | grep 'PATH'
+		WINDOWPATH=2
+		PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+- SHELL變數 屬於env
+- 第一個shell is Bourne Shell
+
+		ubuntu@ubuntu99:~$ env | grep '^SHELL'
+		SHELL=/bin/bash
+
+- /bin/sh : Bourne Shell 
+- /bin/bash : Bourne-Again Shell
+ 
+### 區域變數
+
+
+
+
+
+
+
 ## Module 34. bash shell 指令
+
+
 ## Module 35. bash 環境設定檔
+
+- Shell startup scripts: shell 設定檔
+
+#### 取得bash方式
+
+- login shell (ex. by using tty3 login)
+- non-login shell (ex. by using GUI to open trminal)
+
+### 所有人的Shell startup scripts
+#### 1. /etc/profile
+- 所有使用者在登入期間，首先會被bash所讀取的檔案
+- 裡面又會去執行下面兩段: (see below code block)
+- . /etc/bash.bashrc  
+- /etc/profile.d/*.sh
+
+		root@ubuntu99:~# cat /etc/profile
+		# /etc/profile: system-wide .profile file for the Bourne shell (sh(1))
+		# and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
+		
+		if [ "${PS1-}" ]; then
+		  if [ "${BASH-}" ] && [ "$BASH" != "/bin/sh" ]; then
+		    # The file bash.bashrc already sets the default PS1.
+		    # PS1='\h:\w\$ '
+		    if [ -f /etc/bash.bashrc ]; then
+		      . /etc/bash.bashrc
+		    fi
+		  else
+		    if [ "`id -u`" -eq 0 ]; then
+		      PS1='# '
+		    else
+		      PS1='$ '
+		    fi
+		  fi
+		fi
+		
+		if [ -d /etc/profile.d ]; then
+		  for i in /etc/profile.d/*.sh; do
+		    if [ -r $i ]; then
+		      . $i
+		    fi
+		  done
+		  unset i
+		fi
+
+#### 2. ~/.bash_profile
+- /etc/profile 執行完後，接著執行此檔案內容
+
+### 個人設定檔
+#### 1. /etc/profile
+
+- 載入 /etc/bash.bashrc  
+- 載入 /etc/profile.d/*.sh
+
+#### 2. ~/.bash_profile
+#### 3. ~/.profile
+#### 4. ~/.bashrc 
+
+### Note => hadoop 環境設定會寫在 ~/.bashrc
+
+#### source
+
+- 在目前shell來讀取並執行fileNmae中的命令。該filename檔案可以無"執行許可權" 
+- `source filename` : 設置環境變量
+- `. filename`
+- 當shell 有x權時，可用sh filename and ./filename 執行腳本是相同 (redhat)
+
+		root@bdse8:/etc/profile.d# ./openjdk.sh
+		-bash: ./openjdk.sh: Permission denied
+		root@bdse8:/etc/profile.d# bash openjdk.sh			#bash是另開一個子shell執行, 執行完就回來
+		root@bdse8:/etc/profile.d# echo $JAVA_HOME  		#所以仍吃不到變數
+		
+		root@bdse8:/etc/profile.d# . openjdk.sh				#source 才能在當前shell裡執行(not creat 子shell)
+		root@bdse8:/etc/profile.d# echo $JAVA_HOME
+		/usr/lib/jvm/java-11-openjdk-amd64
+		root@bdse8:/etc/profile.d# $JAVA_HOME/bin/javac -version
+		javac 11.0.9
+
+- tldp.org (bash formal document)
+
+- LSB : Linux Standard Base
+
+		root@bdse8:/etc/profile.d# file $JAVA_HOME/bin/javac
+		/usr/lib/jvm/java-11-openjdk-amd64/bin/javac: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=b47dbae98c0efe565684371ab80b55e0d1d838bb, for GNU/Linux 3.2.0, stripped
+
+
 ## Module 36. 簡單 shell script
 
 
@@ -464,6 +771,25 @@ UID<1000: system user <br>
 
 稱為loopback, 本機localhost			<br>
 
+### 發展...
+
+1. cloud (SESE) {Internet}
+2. IoT (internet of things) ex. temparature/moisture sensor {Collecting Data, embedded skills}  
+3. Big Data: {Management}(Apache Hadoop), {Analysis}(Apache Spark) 
+4. AI: deep learning {Traing data}
+
+https://databricks.com/sparkaisummit/north-america-2020
+
+### tty1~tty7
+
+- Ctrl + Alt + F1/F2/F3~F6/F7
+
+- tty7: Graphic Mode (RedHat/Debian)
+- tty1: Ubuntu代表登入畫面
+- tty2: Ubuntu代表回到原畫面
+- tty3~tty6: 一般的console(主控台)
+
+
 
 ==============================================================
 ## Module b. Linux cheat sheet
@@ -496,5 +822,7 @@ UID<1000: system user <br>
 	/dev/loop0                  56M   56M     0  100% /snap/core18/1885
 	/dev/sda1                  511M  4.0K  511M    1% /boot/efi						# Linux kernal
 	tmpfs                      1.6G   24K  1.6G    1% /run/user/1000
+
+
 
 
