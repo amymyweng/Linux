@@ -1,4 +1,5 @@
-# Linux#  #
+## Linux/Hadoop 
+### Lecture Note & Cheat Sheet
 ## Module 1. Linux 介紹
 
 - 1977 BSD
